@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather Finder</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .weather-search {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        #weather-location {
+            padding: 10px;
+            width: 70%;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        #get-weather {
+            padding: 10px 20px;
+            background: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        #autocomplete-results {
+            border: 1px solid #ddd;
+            max-height: 200px;
+            overflow-y: auto;
+            display: none;
+            position: absolute;
+            background: white;
+            width: calc(70% - 2px);
+        }
+        #autocomplete-results div {
+            padding: 8px 10px;
+            cursor: pointer;
+        }
+        #autocomplete-results div:hover {
+            background: #f0f0f0;
+        }
+    </style>
+</head>
+<body>
+    <h1>Weather Finder</h1>
+    <div class="weather-search">
+        <div style="position: relative; width: 100%;">
+            <input type="text" id="weather-location" placeholder="Enter city or country" autocomplete="off">
+            <div id="autocomplete-results"></div>
+        </div>
+        <button id="get-weather">Get Weather</button>
+    </div>
+
+    <script>
+        // Sample data (in a real app, use an API)
+        const locations = [
+            "Amsterdam, Netherlands",
+            "Athens, Greece",
+            "Austin, USA",
+            "Auckland, New Zealand",
+            "Ankara, Turkey",
+            "Bangkok, Thailand",
+            "Berlin, Germany",
+            "Barcelona, Spain",
+            "Beijing, China",
+            "Cairo, Egypt",
+            "Chicago, USA",
+            "Copenhagen, Denmark",
+            "Delhi, India",
+            "Dubai, UAE",
+            "Dublin, Ireland"
+        ];
+
+        const locationInput = document.getElementById('weather-location');
+        const autocompleteResults = document.getElementById('autocomplete-results');
+        const getWeatherBtn = document.getElementById('get-weather');
+
+        // Autocomplete when typing
+        locationInput.addEventListener('input', function() {
+            const query = this.value.toLowerCase();
+            autocompleteResults.innerHTML = '';
+            
+            if (query.length < 1) {
+                autocompleteResults.style.display = 'none';
+                return;
+            }
+
+            const matches = locations.filter(loc => 
+                loc.toLowerCase().includes(query)
+            );
+
+            if (matches.length > 0) {
+                matches.forEach(match => {
+                    const div = document.createElement('div');
+                    div.textContent = match;
+                    div.addEventListener('click', () => {
+                        locationInput.value = match;
+                        autocompleteResults.style.display = 'none';
+                    });
+                    autocompleteResults.appendChild(div);
+                });
+                autocompleteResults.style.display = 'block';
+            } else {
+                autocompleteResults.style.display = 'none';
+            }
+        });
+
+        // Hide autocomplete when clicking outside
+        document.addEventListener('click', (e) => {
+            if (e.target !== locationInput) {
+                autocompleteResults.style.display = 'none';
+            }
+        });
+
+        // Redirect to weather page
+        getWeatherBtn.addEventListener('click', () => {
+            const location = locationInput.value.trim();
+            if (!location) return;
+            
+            // Store location in localStorage (to pass to next page)
+            localStorage.setItem('weatherLocation', location);
+            
+            // Redirect to weather page
+            window.location.href = 'weather.html';
+        });
+    </script>
+</body>
+</html>

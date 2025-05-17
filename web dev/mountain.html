@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mountain Destinations | GlobeTrekker</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+        
+        body {
+            background-color: #f5f7fa;
+            color: #333;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), 
+                        url('https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80');
+            background-size: cover;
+            color: white;
+            padding: 100px 20px;
+            text-align: center;
+        }
+        
+        h1 {
+            font-size: 3rem;
+            margin-bottom: 20px;
+        }
+        
+        .filter-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin: 30px 0;
+        }
+        
+        .filter-btn {
+            padding: 10px 20px;
+            background: #3498db;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .filter-btn.active {
+            background: #2c3e50;
+        }
+        
+        .destinations-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 30px;
+            margin-top: 40px;
+        }
+        
+        .destination-card {
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            transition: transform 0.3s;
+        }
+        
+        .destination-card:hover {
+            transform: translateY(-10px);
+        }
+        
+        .destination-img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+        }
+        
+        .destination-info {
+            padding: 20px;
+        }
+        
+        .destination-info h3 {
+            margin-bottom: 10px;
+            color: #2c3e50;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .btn {
+            padding: 8px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 14px;
+        }
+        
+        .btn-primary {
+            background: #3498db;
+            color: white;
+        }
+        
+        .btn-outline {
+            background: transparent;
+            border: 1px solid #3498db;
+            color: #3498db;
+        }
+        
+        .destination-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            z-index: 1000;
+            overflow-y: auto;
+        }
+        
+        .modal-content {
+            background: white;
+            max-width: 900px;
+            margin: 50px auto;
+            border-radius: 10px;
+            overflow: hidden;
+            animation: modalFadeIn 0.3s;
+        }
+        
+        @keyframes modalFadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .modal-header {
+            position: relative;
+        }
+        
+        .modal-video {
+            width: 100%;
+            height: 400px;
+            border: none;
+        }
+        
+        .modal-close {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(0,0,0,0.5);
+            color: white;
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            font-size: 20px;
+            cursor: pointer;
+        }
+        
+        .modal-body {
+            padding: 30px;
+        }
+        
+        .modal-gallery {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .modal-gallery img {
+            width: 100%;
+            height: 120px;
+            object-fit: cover;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+        
+        .modal-gallery img:hover {
+            transform: scale(1.05);
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>World's Most Stunning Mountains</h1>
+            <p>Explore majestic peaks, alpine lakes, and breathtaking hiking trails</p>
+        </div>
+    </header>
+
+    <main class="container">
+        <div class="filter-buttons">
+            <button class="filter-btn active">All</button>
+            <button class="filter-btn">Hiking</button>
+            <button class="filter-btn">Skiing</button>
+            <button class="filter-btn">Climbing</button>
+        </div>
+
+        <div class="destinations-grid" id="destinations-container">
+            <!-- Mountain destinations will be loaded here -->
+        </div>
+    </main>
+
+    <!-- Destination Modal -->
+    <div class="destination-modal" id="destinationModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <iframe class="modal-video" id="modalVideo" frameborder="0" allowfullscreen></iframe>
+                <button class="modal-close" id="modalClose">&times;</button>
+            </div>
+            <div class="modal-body">
+                <h2 id="modalTitle">Mountain Name</h2>
+                <p id="modalDescription">Loading description...</p>
+                <div class="action-buttons">
+                    <button class="btn btn-primary" id="planTripBtn">Plan Trip to This Mountain</button>
+                </div>
+                <h3>Gallery</h3>
+                <div class="modal-gallery" id="modalGallery">
+                    <!-- Images will be loaded here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Mountain destinations data
+        const mountainDestinations = [
+            {
+                id: 1,
+                name: "Swiss Alps, Switzerland",
+                type: ["Hiking", "Skiing"],
+                image: "https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1746&q=80",
+                video: "https://www.youtube.com/embed/3cnHhQaAJa4",
+                description: "The Swiss Alps offer some of the most spectacular mountain scenery in the world, with perfect conditions for hiking in summer and skiing in winter. Home to the iconic Matterhorn.",
+                gallery: [
+                    "https://images.unsplash.com/photo-1582268611958-ebfd161ef9cf?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80",
+                    "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80",
+                    "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80"
+                ]
+            },
+            {
+                id: 2,
+                name: "Rocky Mountains, Canada",
+                type: ["Hiking", "Climbing"],
+                image: "https://images.unsplash.com/photo-1507272931001-fc06c17e4f43?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80",
+                video: "https://www.youtube.com/embed/3cnHhQaAJa4",
+                description: "The Canadian Rockies are a spectacular range of mountains with stunning lakes, glaciers and diverse wildlife. Banff and Jasper National Parks are must-visit destinations.",
+                gallery: [
+                    "https://images.unsplash.com/photo-1507272931001-fc06c17e4f43?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80",
+                    "https://images.unsplash.com/photo-1501785888041-af3ef285b470?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80",
+                    "https://images.unsplash.com/photo-1476231682828-37e571bc172f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80"
+                ]
+            },
+            {
+                id: 3,
+                name: "Himalayas, Nepal",
+                type: ["Climbing", "Hiking"],
+                image: "https://images.unsplash.com/photo-1582268611958-ebfd161ef9cf?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80",
+                video: "https://www.youtube.com/embed/3cnHhQaAJa4",
+                description: "Home to Mount Everest, the Himalayas offer the ultimate challenge for climbers and breathtaking treks for hikers. The Annapurna Circuit is one of the world's great hikes.",
+                gallery: [
+                    "https://images.unsplash.com/photo-1582268611958-ebfd161ef9cf?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80",
+                    "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80",
+                    "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80"
+                ]
+            },
+            {
+                id: 4,
+                name: "Andes, Peru",
+                type: ["Hiking"],
+                image: "https://images.unsplash.com/photo-1483729558449-99ef09a8c325?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80",
+                video: "https://www.youtube.com/embed/3cnHhQaAJa4",
+                description: "The Andes mountains in Peru feature the famous Inca Trail leading to Machu Picchu, one of the world's greatest hikes. The Sacred Valley offers stunning mountain scenery.",
+                gallery: [
+                    "https://images.unsplash.com/photo-1483729558449-99ef09a8c325?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80",
+                    "https://images.unsplash.com/photo-1526397751294-331021109fbd?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80",
+                    "https://images.unsplash.com/photo-1575408264798-b50b252663e6?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1740&q=80"
+                ]
+            }
+        ];
+
+        // DOM Elements
+        const destinationsContainer = document.getElementById('destinations-container');
+        const filterButtons = document.querySelectorAll('.filter-btn');
+        const modal = document.getElementById('destinationModal');
+        const modalClose = document.getElementById('modalClose');
+        const modalVideo = document.getElementById('modalVideo');
+        const modalTitle = document.getElementById('modalTitle');
+        const modalDescription = document.getElementById('modalDescription');
+        const modalGallery = document.getElementById('modalGallery');
+        const planTripBtn = document.getElementById('planTripBtn');
+
+        // Current selected mountain for trip planning
+        let currentMountain = null;
+
+        // Load destinations
+        function loadDestinations(filter = 'all') {
+            destinationsContainer.innerHTML = '';
+            
+            const filteredDestinations = filter === 'all' 
+                ? mountainDestinations 
+                : mountainDestinations.filter(dest => dest.type.includes(filter));
+            
+            filteredDestinations.forEach(destination => {
+                const card = document.createElement('div');
+                card.className = 'destination-card';
+                card.innerHTML = `
+                    <img src="${destination.image}" alt="${destination.name}" class="destination-img">
+                    <div class="destination-info">
+                        <h3>${destination.name}</h3>
+                        <p>${destination.type.join(' • ')}</p>
+                        <div class="action-buttons">
+                            <button class="btn btn-primary view-details-btn" data-id="${destination.id}">View Details</button>
+                            <button class="btn btn-outline plan-trip-btn" data-id="${destination.id}">Plan Trip</button>
+                        </div>
+                    </div>
+                `;
+                destinationsContainer.appendChild(card);
+            });
+
+            // Add event listeners to new buttons
+            document.querySelectorAll('.view-details-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const id = parseInt(e.target.dataset.id);
+                    const destination = mountainDestinations.find(dest => dest.id === id);
+                    openModal(destination);
+                });
+            });
+
+            document.querySelectorAll('.plan-trip-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const id = parseInt(e.target.dataset.id);
+                    const destination = mountainDestinations.find(dest => dest.id === id);
+                    planTrip(destination);
+                });
+            });
+        }
+
+        // Open modal with destination details
+        function openModal(destination) {
+            currentMountain = destination;
+            modalTitle.textContent = destination.name;
+            modalDescription.textContent = destination.description;
+            modalVideo.src = destination.video;
+            
+            modalGallery.innerHTML = '';
+            destination.gallery.forEach(imgUrl => {
+                const img = document.createElement('img');
+                img.src = imgUrl;
+                img.alt = destination.name;
+                modalGallery.appendChild(img);
+            });
+            
+            modal.style.display = 'block';
+            document.body.style.overflow = 'hidden';
+        }
+
+        // Plan trip to selected mountain
+        function planTrip(destination) {
+            // Store the selected mountain in localStorage
+            localStorage.setItem('selectedDestination', JSON.stringify(destination));
+            
+            // Redirect to your existing trip planner page
+            window.location.href = 'index.html#planner'; // Change to your actual trip planner URL
+        }
+
+        // Close modal
+        function closeModal() {
+            modal.style.display = 'none';
+            modalVideo.src = '';
+            document.body.style.overflow = 'auto';
+        }
+
+        // Event listeners
+        filterButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                filterButtons.forEach(btn => btn.classList.remove('active'));
+                button.classList.add('active');
+                loadDestinations(button.textContent);
+            });
+        });
+
+        modalClose.addEventListener('click', closeModal);
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) closeModal();
+        });
+
+        planTripBtn.addEventListener('click', () => {
+            if (currentMountain) {
+                planTrip(currentMountain);
+            }
+        });
+
+        // Initial load
+        loadDestinations();
+    </script>
+</body>
+</html>

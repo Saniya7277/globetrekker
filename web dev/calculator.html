@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Travel Budget Calculator</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="calculator">
+        <h1>✈ Travel Budget Calculator</h1>
+        <div class="input-group">
+            <label for="transportation">Transportation (£):</label>
+            <input type="number" id="transportation" placeholder="Flights, trains, etc.">
+        </div>
+        <div class="input-group">
+            <label for="accommodation">Accommodation (£):</label>
+            <input type="number" id="accommodation" placeholder="Hotels, hostels, etc.">
+        </div>
+        <div class="input-group">
+            <label for="food">Food (£):</label>
+            <input type="number" id="food" placeholder="Meals, snacks, etc.">
+        </div>
+        <div class="input-group">
+            <label for="activities">Activities (£):</label>
+            <input type="number" id="activities" placeholder="Tours, tickets, etc.">
+        </div>
+        <div class="input-group">
+            <label for="miscellaneous">Miscellaneous (£):</label>
+            <input type="number" id="miscellaneous" placeholder="Shopping, emergencies, etc.">
+        </div>
+        <button onclick="calculateBudget()">Calculate Total</button>
+        <div class="result" id="result"></div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>

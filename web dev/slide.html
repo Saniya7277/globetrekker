@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Testimonial Slider with Smart Alerts</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        /* Testimonials Section */
+        .testimonials {
+            padding: 60px 0;
+            background-color: #f8f9fa;
+            font-family: 'Arial', sans-serif;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        .testimonials h2 {
+            text-align: center;
+            margin-bottom: 40px;
+            color: #333;
+        }
+        
+        .testimonial-slider {
+            max-width: 800px;
+            margin: 0 auto;
+            position: relative;
+        }
+        
+        .testimonial {
+            display: none;
+            text-align: center;
+            padding: 30px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .testimonial.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        .testimonial p {
+            font-size: 18px;
+            line-height: 1.6;
+            color: #555;
+            margin-bottom: 20px;
+            font-style: italic;
+        }
+        
+        .testimonial-author {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .testimonial-author img {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-right: 15px;
+        }
+        
+        .testimonial-author span {
+            font-weight: bold;
+            color: #333;
+        }
+        
+        .slider-controls {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 30px;
+        }
+        
+        .slider-prev, .slider-next {
+            background: none;
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+            color: #666;
+            transition: color 0.3s;
+            padding: 10px 15px;
+        }
+        
+        .slider-prev:hover, .slider-next:hover {
+            color: #333;
+        }
+        
+        .slider-dots {
+            display: flex;
+            margin: 0 20px;
+        }
+        
+        .dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #ccc;
+            margin: 0 5px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        
+        .dot.active {
+            background: #333;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        .notification {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0,0,0,0.8);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+            z-index: 1000;
+            animation: fadeInOut 3s forwards;
+            display: none;
+        }
+        
+        @keyframes fadeInOut {
+            0% { opacity: 0; top: 0; }
+            10% { opacity: 1; top: 20px; }
+            90% { opacity: 1; top: 20px; }
+            100% { opacity: 0; top: 0; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Notification div (replaces alerts) -->
+    <div class="notification" id="notification"></div>
+    
+    <!-- Testimonials -->
+    <section class="testimonials">
+        <div class="container">
+            <h2>What Our Travelers Say</h2>
+            <div class="testimonial-slider">
+                <div class="testimonial active">
+                    <p>"GlobeTrekker helped me plan the perfect 3-week European tour. The itinerary builder saved me hours of research!"</p>
+                    <div class="testimonial-author">
+                        <img src="https://randomuser.me/api/portraits/women/32.jpg" alt="Jessica">
+                        <span>Jessica T., Canada</span>
+                    </div>
+                </div>
+                <div class="testimonial">
+                    <p>"I discovered amazing hidden beaches in Thailand through this platform that weren't in any guidebooks."</p>
+                    <div class="testimonial-author">
+                        <img src="https://randomuser.me/api/portraits/men/45.jpg" alt="Raj">
+                        <span>Raj P., India</span>
+                    </div>
+                </div>
+                <div class="testimonial">
+                    <p>"The budget calculator was spot on for my South American backpacking trip. No surprise expenses!"</p>
+                    <div class="testimonial-author">
+                        <img src="https://randomuser.me/api/portraits/women/68.jpg" alt="Sophie">
+                        <span>Sophie L., Australia</span>
+                    </div>
+                </div>
+                <div class="slider-controls">
+                    <button class="slider-prev"><i class="fas fa-chevron-left"></i></button>
+                    <div class="slider-dots">
+                        <span class="dot active" data-index="0"></span>
+                        <span class="dot" data-index="1"></span>
+                        <span class="dot" data-index="2"></span>
+                    </div>
+                    <button class="slider-next"><i class="fas fa-chevron-right"></i></button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const testimonials = document.querySelectorAll('.testimonial');
+            const dots = document.querySelectorAll('.dot');
+            const prevBtn = document.querySelector('.slider-prev');
+            const nextBtn = document.querySelector('.slider-next');
+            const notification = document.getElementById('notification');
+            let currentIndex = 0;
+            
+            // Array of traveler names for notifications
+            const travelerNames = ["Jessica T. from Canada", "Raj P. from India", "Sophie L. from Australia"];
+
+            // Show notification message
+            function showNotification(message) {
+                notification.textContent = message;
+                notification.style.display = 'block';
+                setTimeout(() => {
+                    notification.style.display = 'none';
+                }, 3000);
+            }
+
+            // Show current slide
+            function showSlide(index) {
+                testimonials.forEach(testimonial => testimonial.classList.remove('active'));
+                dots.forEach(dot => dot.classList.remove('active'));
+                
+                testimonials[index].classList.add('active');
+                dots[index].classList.add('active');
+                currentIndex = index;
+            }
+
+            // Next slide
+            function nextSlide() {
+                let newIndex = currentIndex + 1;
+                if (newIndex >= testimonials.length) {
+                    newIndex = 0;
+                    showNotification("Reached the end - looping back to first testimonial");
+                }
+                showSlide(newIndex);
+            }
+
+            // Previous slide
+            function prevSlide() {
+                let newIndex = currentIndex - 1;
+                if (newIndex < 0) {
+                    newIndex = testimonials.length - 1;
+                    showNotification("Reached the beginning - looping to last testimonial");
+                }
+                showSlide(newIndex);
+            }
+
+            // Dot navigation
+            dots.forEach(dot => {
+                dot.addEventListener('click', function() {
+                    const slideIndex = parseInt(this.getAttribute('data-index'));
+                    showNotification("Showing testimonial from " + travelerNames[slideIndex]);
+                    showSlide(slideIndex);
+                });
+            });
+
+            // Button events
+            nextBtn.addEventListener('click', nextSlide);
+            prevBtn.addEventListener('click', prevSlide);
+
+            // Initial welcome alert (only show once)
+            alert("Welcome to our Testimonial Slider!\n\nNavigate using the arrows or dots below.");
+        });
+    </script>
+</body>
+</html>

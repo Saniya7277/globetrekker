@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather Details</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            text-align: center;
+        }
+        .weather-card {
+            background: #f9f9f9;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .weather-icon {
+            font-size: 50px;
+            margin: 10px 0;
+        }
+        .weather-temp {
+            font-size: 32px;
+            font-weight: bold;
+        }
+        .weather-details {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 15px;
+        }
+        #back-button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            background: #6c757d;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <h1 id="weather-location">Weather Details</h1>
+    <div class="weather-card">
+        <div class="weather-icon" id="weather-icon">⛅</div>
+        <div id="weather-description">Partly Cloudy</div>
+        <div class="weather-temp" id="weather-temp">18°C</div>
+        <div class="weather-details">
+            <div>💧 <span id="humidity">65%</span></div>
+            <div>🌬 <span id="wind">12 km/h</span></div>
+        </div>
+    </div>
+    <button id="back-button">Back to Search</button>
+
+    <script>
+        // Hardcoded weather data for Paris and Switzerland
+        const weatherData = {
+            "Paris, France": {
+                icon: "☁",
+                description: "Cloudy",
+                temp: "18°C",
+                humidity: "78%",
+                wind: "12 km/h"
+            },
+            "Switzerland": {
+                icon: "⛅",
+                description: "Partly Sunny",
+                temp: "15°C",
+                humidity: "70%",
+                wind: "8 km/h"
+            }
+        };
+
+        // Get location from localStorage
+        const location = localStorage.getItem('weatherLocation');
+        document.getElementById('weather-location').textContent = location || "Unknown Location";
+
+        // Update weather display
+        if (weatherData[location]) {
+            const weather = weatherData[location];
+            document.getElementById('weather-icon').textContent = weather.icon;
+            document.getElementById('weather-description').textContent = weather.description;
+            document.getElementById('weather-temp').textContent = weather.temp;
+            document.getElementById('humidity').textContent = weather.humidity;
+            document.getElementById('wind').textContent = weather.wind;
+        } else {
+            document.getElementById('weather-description').textContent = "Weather data not available for this location.";
+        }
+
+        // Back button
+        document.getElementById('back-button').addEventListener('click', () => {
+            window.location.href = 'index.html';
+        });
+    </script>
+</body>
+</html>

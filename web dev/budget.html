@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trip Budget Calculator (INR)</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+        }
+        .calculator {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        select, input {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            width: 100%;
+        }
+        button:hover {
+            background-color: #2980b9;
+        }
+        #results {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #e8f4fc;
+            border-radius: 4px;
+            display: none;
+        }
+        .result-item {
+            margin-bottom: 10px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #ccc;
+        }
+        .result-item:last-child {
+            border-bottom: none;
+        }
+        .total {
+            font-weight: bold;
+            font-size: 1.2em;
+            color: #2c3e50;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Trip Budget Calculator (INR)</h1>
+    <div class="calculator">
+        <div class="form-group">
+            <label for="from">From:</label>
+            <select id="from">
+                <option value="paris">Paris, France</option>
+                <option value="tokyo">Tokyo, Japan</option>
+                <option value="newyork">New York, USA</option>
+                <option value="rome">Rome, Italy</option>
+                <option value="delhi">Delhi, India</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="to">To:</label>
+            <select id="to">
+                <option value="paris">Paris, France</option>
+                <option value="tokyo">Tokyo, Japan</option>
+                <option value="newyork">New York, USA</option>
+                <option value="rome">Rome, Italy</option>
+                <option value="delhi">Delhi, India</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="duration">Trip Duration (nights):</label>
+            <input type="number" id="duration" min="1" value="7">
+        </div>
+
+        <div class="form-group">
+            <label for="travelers">Number of Travelers:</label>
+            <input type="number" id="travelers" min="1" value="1">
+        </div>
+
+        <div class="form-group">
+            <label for="hotel-level">Hotel Level:</label>
+            <select id="hotel-level">
+                <option value="budget">Budget ($50/night)</option>
+                <option value="midrange" selected>Mid-range ($150/night)</option>
+                <option value="luxury">Luxury ($400/night)</option>
+            </select>
+        </div>
+
+        <button onclick="calculateBudget()">Calculate Budget</button>
+
+        <div id="results"></div>
+    </div>
+
+    <script>
+        // Indian Rupee (INR) exchange rate to USD (as of a specific date)
+        const inrToUsd = 82.5; // Example rate, please update to the current rate for accuracy
+
+        // Flight cost matrix (in USD)
+        const flightCostsUSD = {
+            paris: {
+                paris: 0,
+                tokyo: 1200,
+                newyork: 800,
+                rome: 150,
+                delhi: 700
+            },
+            tokyo: {
+                paris: 1200,
+                tokyo: 0,
+                newyork: 1400,
+                rome: 1300,
+                delhi: 900
+            },
+            newyork: {
+                paris: 800,
+                tokyo: 1400,
+                newyork: 0,
+                rome: 900,
+                delhi: 1100
+            },
+            rome: {
+                paris: 150,
+                tokyo: 1300,
+                newyork: 900,
+                rome: 0,
+                delhi: 750
+            },
+            delhi: {
+                paris: 700,
+                tokyo: 900,
+                newyork: 1100,
+                rome: 750,
+                delhi: 0
+            }
+        };
+
+        // Hotel costs per night (in USD)
+        const hotelCostsUSD = {
+            paris: {
+                budget: 50,
+                midrange: 150,
+                luxury: 400
+            },
+            tokyo: {
+                budget: 60,
+                midrange: 180,
+                luxury: 450
+            },
+            newyork: {
+                budget: 70,
+                midrange: 200,
+                luxury: 500
+            },
+            rome: {
+                budget: 45,
+                midrange: 130,
+                luxury: 350
+            },
+            delhi: {
+                budget: 20,
+                midrange: 80,
+                luxury: 250
+            }
+        };
+
+        // Daily expenses estimates (food, transport, activities) in USD
+        const dailyExpensesUSD = {
+            paris: 100,
+            tokyo: 110,
+            newyork: 120,
+            rome: 90,
+            delhi: 50
+        };
+
+        function calculateBudget() {
+            // Get user inputs
+            const from = document.getElementById('from').value;
+            const to = document.getElementById('to').value;
+            const duration = parseInt(document.getElementById('duration').value);
+            const travelers = parseInt(document.getElementById('travelers').value);
+            const hotelLevel = document.getElementById('hotel-level').value;
+
+            // Calculate costs in USD
+            const flightCostUSD = flightCostsUSD[from][to] * travelers;
+            const hotelCostUSD = hotelCostsUSD[to][hotelLevel] * duration * travelers;
+            const dailyCostUSD = dailyExpensesUSD[to] * duration * travelers;
+            const totalCostUSD = flightCostUSD + hotelCostUSD + dailyCostUSD;
+
+            // Convert USD to INR
+            const flightCostINR = Math.round(flightCostUSD * inrToUsd);
+            const hotelCostINR = Math.round(hotelCostUSD * inrToUsd);
+            const dailyCostINR = Math.round(dailyCostUSD * inrToUsd);
+            const totalCostINR = Math.round(totalCostUSD * inrToUsd);
+
+            // Display results in INR
+            const resultsDiv = document.getElementById('results');
+            resultsDiv.innerHTML = `
+                <div class="result-item"><strong>Flight Cost:</strong> ₹${flightCostINR.toLocaleString('en-IN')}</div>
+                <div class="result-item"><strong>Hotel Cost (${hotelLevel}):</strong> ₹${hotelCostINR.toLocaleString('en-IN')}</div>
+                <div class="result-item"><strong>Daily Expenses:</strong> ₹${dailyCostINR.toLocaleString('en-IN')}</div>
+                <div class="total">Total Estimated Cost: ₹${totalCostINR.toLocaleString('en-IN')}</div>
+            `;
+
+            resultsDiv.style.display = 'block';
+        }
+    </script>
+    <button onclick="alert('Congrats your ticket has been booked')">Book My ticket
+    </button>
+</body>
+</html>
